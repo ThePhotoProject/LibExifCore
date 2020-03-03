@@ -92,11 +92,9 @@ namespace LibExifCore
 
         private Dictionary<string, object> ReadExifData(BinaryReader br, uint exifOffset)
         {
-
             // Should we make assumptions about endianness for HEIC? Really the only code
             // difference would be instantiating a BinaryReader vs BigEndianBinaryReader
 
-            //BigEndianBinaryReader br = new BigEndianBinaryReader(fileStream);
             br.BaseStream.Seek(exifOffset, SeekOrigin.Begin);
 
             //bool bigEndian;
@@ -229,7 +227,7 @@ namespace LibExifCore
 
             for(int i = 0; i < numEntries; i++)
             {
-                uint entryOffset = (uint)(dirStart + i * 12 + 2);    // WTF magic numbers?
+                uint entryOffset = (uint)(dirStart + i * 12 + 2);    // WTF magic numbers?!
 
                 br.BaseStream.Seek(entryOffset, SeekOrigin.Begin);
 
