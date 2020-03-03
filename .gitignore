@@ -1,2 +1,4 @@
 LibExifCore/obj/
 LibExifCoreTester/obj/
+.vs/
+LibExifCoreTester/bin/
