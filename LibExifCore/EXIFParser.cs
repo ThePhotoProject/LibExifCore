@@ -474,7 +474,7 @@ namespace LibExifCore
                     break;
             }
 
-            if(result is Array)
+            if(numValues == 1 && result is Array)
             {
                 // If there's only one item, return that rather than a one-item array
                 Array resultArray = (Array)result;
