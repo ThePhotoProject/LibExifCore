@@ -256,6 +256,7 @@ namespace LibExifCore
             uint numValues = br.ReadUInt32();
             uint valueOffset = br.ReadUInt32() + tiffStart;
 
+#if false
             uint offset;
 
             switch (tagType)
@@ -389,8 +390,99 @@ namespace LibExifCore
                         return vals6;
                     }
             }
-
             return null;
+
+#else
+            object result = null;
+            uint offset = entryOffset + 8;
+
+            switch (tagType)
+            {
+                case 1: // byte, 8-bit unsigned int
+                case 7: // undefined, 8-bit byte, value depending on field
+                    if (numValues != 1)
+                    {
+                        offset = numValues > 4 ? valueOffset : (entryOffset + 8);
+                    }
+                    
+                    br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
+                    result = br.ReadBytes((int)numValues);
+                    break;
+
+                case 2: // ascii, 8-bit byte
+                    offset = numValues > 4 ? valueOffset : (entryOffset + 8);
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    byte[] vals = br.ReadBytes((int)numValues - 1);
+                    result = System.Text.ASCIIEncoding.ASCII.GetString(vals, 0, vals.Length);
+                    break;
+
+                case 3: // short, 16 bit int
+                    if (numValues != 1)
+                    {
+                        offset = numValues > 2 ? valueOffset : (entryOffset + 8);
+                    }
+                    br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
+                    result = br.ReadUInt16((int)numValues);
+                    break;
+
+                case 4: // long, 32 bit int
+                    if (numValues != 1)
+                    {
+                        offset = valueOffset;
+                    }
+
+                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    result = br.ReadUInt32((int)numValues);
+                    break;
+
+                case 5:    // rational = two long values, first is numerator, second is denominator
+                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    UInt32[] parts = br.ReadUInt32((int)numValues * 2);
+                    float[] floats = new float[numValues];
+                    for(int i = 0; i < parts.Length; i += 2)
+                    {
+                        uint numerator = parts[i];
+                        uint denominator = parts[i+1];
+                        floats[i] = (numerator / denominator);
+                    }
+
+                    result = floats;
+                    break;
+
+                case 9: // slong, 32 bit signed int
+                    if (numValues != 1)
+                    {
+                        offset = valueOffset;
+                    }
+
+                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    result = br.ReadInt32((int)numValues);
+                    break;
+
+                case 10: // signed rational, two slongs, first is numerator, second is denominator
+                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    Int32[] sparts = br.ReadInt32((int)numValues * 2);
+                    float[] sfloats = new float[numValues];
+                    for (int i = 0; i < sparts.Length; i += 2)
+                    {
+                        int numerator = sparts[i];
+                        int denominator = sparts[i + 1];
+                        sfloats[i] = (numerator / denominator);
+                    }
+
+                    result = sfloats;
+                    break;
+            }
+
+            if(result is Array)
+            {
+                // If there's only one item, return that rather than a one-item array
+                Array resultArray = (Array)result;
+                result = resultArray.GetValue(0);
+            }
+
+            return result;
+#endif
         }
 
         private int GetValueAsInt(object obj)
