@@ -405,7 +405,7 @@ namespace LibExifCore
                         offset = numValues > 4 ? valueOffset : (entryOffset + 8);
                     }
                     
-                    br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
                     result = br.ReadBytes((int)numValues);
                     break;
 
@@ -421,7 +421,7 @@ namespace LibExifCore
                     {
                         offset = numValues > 2 ? valueOffset : (entryOffset + 8);
                     }
-                    br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
                     result = br.ReadUInt16((int)numValues);
                     break;
 
@@ -431,7 +431,7 @@ namespace LibExifCore
                         offset = valueOffset;
                     }
 
-                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
                     result = br.ReadUInt32((int)numValues);
                     break;
 
@@ -439,10 +439,10 @@ namespace LibExifCore
                     br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
                     UInt32[] parts = br.ReadUInt32((int)numValues * 2);
                     float[] floats = new float[numValues];
-                    for(int i = 0; i < parts.Length; i += 2)
+                    for(int i = 0; i < numValues; i++)
                     {
-                        uint numerator = parts[i];
-                        uint denominator = parts[i+1];
+                        uint numerator = parts[(i * 2)];
+                        uint denominator = parts[(i * 2) + 1];
                         floats[i] = (numerator / denominator);
                     }
 
@@ -455,7 +455,7 @@ namespace LibExifCore
                         offset = valueOffset;
                     }
 
-                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
                     result = br.ReadInt32((int)numValues);
                     break;
 
@@ -463,10 +463,10 @@ namespace LibExifCore
                     br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
                     Int32[] sparts = br.ReadInt32((int)numValues * 2);
                     float[] sfloats = new float[numValues];
-                    for (int i = 0; i < sparts.Length; i += 2)
+                    for (int i = 0; i < numValues; i++)
                     {
-                        int numerator = sparts[i];
-                        int denominator = sparts[i + 1];
+                        int numerator = sparts[(i * 2)];
+                        int denominator = sparts[(i * 2) + 1];
                         sfloats[i] = (numerator / denominator);
                     }
 
