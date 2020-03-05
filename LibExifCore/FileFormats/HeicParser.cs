@@ -35,7 +35,6 @@ namespace LibExifCore.FileFormats
             int ilocOffset = -1;
             for (int i = (int)fTypeSize; i < metadataSize + fTypeSize; i++)  // copying the code exactly, but I think 
             {                                                               // this should be var i = ftTypeSize + 4?
-                // Is there a read with offset? Do we need to be seeking all the time?
                 fileStream.Seek(i, SeekOrigin.Begin);
 
                 int nextValue = br.ReadInt32();
