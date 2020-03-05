@@ -1,5 +1,5 @@
-LibExifCore/obj/
-LibExifCoreTester/obj/
 .vs/
-LibExifCoreTester/bin/
+LibExifCore/obj/
 LibExifCore/bin/
+LibExifCoreExample/bin/
+LibExifCoreExample/obj/
