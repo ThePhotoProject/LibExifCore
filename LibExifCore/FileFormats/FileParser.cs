@@ -8,7 +8,6 @@ namespace LibExifCore.FileFormats
     public abstract class FileParser
     {
         public Dictionary<string, object> Tags { get; protected set; }
-        protected BinaryReader _binaryReader;
 
         public FileParser()
         {
