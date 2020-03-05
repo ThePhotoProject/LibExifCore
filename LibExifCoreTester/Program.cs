@@ -12,7 +12,7 @@ namespace LibExifCoreExample
             {
                 Console.WriteLine("LibExifCore Example Tool");
                 Console.WriteLine("");
-                Console.WriteLine("Usage: LibExifCore.exe [path]");
+                Console.WriteLine("Usage: LibExifCoreExample.exe [path]");
                 Console.WriteLine("");
                 Console.WriteLine("path: file path to the image to analyze");
                 return;

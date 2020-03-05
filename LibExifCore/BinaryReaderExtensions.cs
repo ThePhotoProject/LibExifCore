@@ -3,6 +3,9 @@ using System.IO;
 
 namespace LibExifCore
 {
+    /// <summary>
+    /// Extension functions for BinaryReader for reading multiple items at once
+    /// </summary>
     public static class BinaryReaderExtensions
     {
         public static Int16[] ReadInt16(this BinaryReader reader, int numItems)

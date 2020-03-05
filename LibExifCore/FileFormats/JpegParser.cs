@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LibExifCore.FileFormats
 {
@@ -37,7 +35,7 @@ namespace LibExifCore.FileFormats
                 // but right now this is only handling 0xFFE1 for EXIF data
                 if (marker == 0xE1)
                 {
-                    Tags = ReadExifData(br, (uint)(offset + 4 + 6)); //, dataView.getUint16(offset + 2) - 2);
+                    Tags = ReadExifData(br, (uint)(offset + 4 + 6));
                     return true;
                 }
                 else
