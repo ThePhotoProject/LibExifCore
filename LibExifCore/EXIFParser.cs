@@ -26,6 +26,10 @@ namespace LibExifCore
             {
                 parser = new HeicParser();
             }
+            else if(extension.Equals(".jpg") || extension.Equals(".jpeg"))
+            {
+                parser = new JpegParser();
+            }
             else
             {
                 throw new NotImplementedException("Support for " + extension + " files is not yet implemented.");
