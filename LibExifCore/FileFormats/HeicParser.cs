@@ -71,7 +71,7 @@ namespace LibExifCore.FileFormats
                     uint exifLocation = br.ReadUInt32();
                     uint exifSize = br.ReadUInt32();
 
-                    // Check prefix at exif exifOffset
+                    // Check prefix at exifOffset
                     fileStream.Seek(exifLocation, SeekOrigin.Begin);
                     uint prefixSize = 4 + br.ReadUInt32();
                     uint exifOffset2 = exifLocation + prefixSize;

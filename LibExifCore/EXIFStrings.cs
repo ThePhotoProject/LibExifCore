@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LibExifCore
 {
+    /// <summary>
+    /// String descriptions of various EXIF fields
+    /// </summary>
     public class EXIFStrings
     {
         public static readonly Dictionary<int, string> TiffTags = new Dictionary<int, string>()
