@@ -256,141 +256,95 @@ namespace LibExifCore
             uint numValues = br.ReadUInt32();
             uint valueOffset = br.ReadUInt32() + tiffStart;
 
-            uint offset;
+            object result = null;
+            uint offset = entryOffset + 8;
 
             switch (tagType)
             {
                 case 1: // byte, 8-bit unsigned int
                 case 7: // undefined, 8-bit byte, value depending on field
-                    if (numValues == 1)
-                    {
-                        br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
-                        return br.ReadByte();
-                    }
-                    else
+                    if (numValues != 1)
                     {
                         offset = numValues > 4 ? valueOffset : (entryOffset + 8);
-                        byte[] vals1 = new byte[numValues];
-
-                        br.BaseStream.Seek(offset, SeekOrigin.Begin);
-
-                        for (int n = 0; n < numValues; n++)
-                        {
-                            vals1[n] = br.ReadByte();
-                        }
-                        return vals1;
                     }
+                    
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    result = br.ReadBytes((int)numValues);
+                    break;
 
                 case 2: // ascii, 8-bit byte
                     offset = numValues > 4 ? valueOffset : (entryOffset + 8);
                     br.BaseStream.Seek(offset, SeekOrigin.Begin);
-                    byte[] vals = new byte[numValues - 1];
-                    for(int i = 0; i < vals.Length; i++)
-                    {
-                        vals[i] = br.ReadByte();
-                    }
-                    return System.Text.ASCIIEncoding.ASCII.GetString(vals, 0, vals.Length);
+                    byte[] vals = br.ReadBytes((int)numValues - 1);
+                    result = System.Text.ASCIIEncoding.ASCII.GetString(vals, 0, vals.Length);
+                    break;
 
                 case 3: // short, 16 bit int
-                    if (numValues == 1)
-                    {
-                        br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
-                        return br.ReadUInt16();
-                    }
-                    else
+                    if (numValues != 1)
                     {
                         offset = numValues > 2 ? valueOffset : (entryOffset + 8);
-                        ushort[] vals2 = new ushort[numValues];
-
-                        br.BaseStream.Seek(offset, SeekOrigin.Begin);
-                        for (int n = 0; n < numValues; n++)
-                        {
-                            vals2[n] = br.ReadUInt16();
-                        }
-                        return vals2;
                     }
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    result = br.ReadUInt16((int)numValues);
+                    break;
 
                 case 4: // long, 32 bit int
-                    if (numValues == 1)
+                    if (numValues != 1)
                     {
-                        br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
-                        return br.ReadUInt32();
+                        offset = valueOffset;
                     }
-                    else
-                    {
-                        br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
-                        uint[] vals3 = new uint[numValues];
-                        for (int n = 0; n < numValues; n++)
-                        {
-                            vals3[n] = br.ReadUInt32();
-                        }
-                        return vals3;
-                    }
+
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    result = br.ReadUInt32((int)numValues);
+                    break;
 
                 case 5:    // rational = two long values, first is numerator, second is denominator
-                    if (numValues == 1)
+                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    UInt32[] parts = br.ReadUInt32((int)numValues * 2);
+                    float[] floats = new float[numValues];
+                    for(int i = 0; i < numValues; i++)
                     {
-                        br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
-                        uint numerator = br.ReadUInt32();
-                        uint denominator = br.ReadUInt32();
-                        return (numerator / denominator);
+                        uint numerator = parts[(i * 2)];
+                        uint denominator = parts[(i * 2) + 1];
+                        floats[i] = (numerator / denominator);
                     }
-                    else
-                    {
-                        br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
 
-                        float[] vals4 = new float[numValues];
-                        for (int n = 0; n < numValues; n++)
-                        {
-                            uint numerator = br.ReadUInt32();
-                            uint denominator = br.ReadUInt32();
-                            vals4[n] = (numerator / denominator);
-                        }
-                        return vals4;
-                    }
+                    result = floats;
+                    break;
 
                 case 9: // slong, 32 bit signed int
-                    if (numValues == 1)
+                    if (numValues != 1)
                     {
-                        br.BaseStream.Seek(entryOffset + 8, SeekOrigin.Begin);
-                        return br.ReadInt32();
+                        offset = valueOffset;
                     }
-                    else
-                    {
-                        br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
-                        int[] vals5 = new int[numValues];
-                        for (int n = 0; n < numValues; n++)
-                        {
-                            vals5[n] = br.ReadInt32();
-                        }
-                        return vals5;
-                    }
+
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    result = br.ReadInt32((int)numValues);
+                    break;
 
                 case 10: // signed rational, two slongs, first is numerator, second is denominator
-                    if (numValues == 1)
+                    br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
+                    Int32[] sparts = br.ReadInt32((int)numValues * 2);
+                    float[] sfloats = new float[numValues];
+                    for (int i = 0; i < numValues; i++)
                     {
-                        br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
-                        int numerator = br.ReadInt32();
-                        int denominator = br.ReadInt32();
-                        return (numerator / denominator);
+                        int numerator = sparts[(i * 2)];
+                        int denominator = sparts[(i * 2) + 1];
+                        sfloats[i] = (numerator / denominator);
                     }
-                    else
-                    {
-                        br.BaseStream.Seek(valueOffset, SeekOrigin.Begin);
 
-                        float[] vals6 = new float[numValues];
-                        for (int n = 0; n < numValues; n++)
-                        {
-                            int numerator = br.ReadInt32();
-                            int denominator = br.ReadInt32();
-
-                            vals6[n] = (numerator / denominator);
-                        }
-                        return vals6;
-                    }
+                    result = sfloats;
+                    break;
             }
 
-            return null;
+            if(numValues == 1 && result is Array)
+            {
+                // If there's only one item, return that rather than a one-item array
+                Array resultArray = (Array)result;
+                result = resultArray.GetValue(0);
+            }
+
+            return result;
         }
 
         private int GetValueAsInt(object obj)

@@ -1,16 +1,33 @@
 ﻿using System;
+using System.IO;
 using LibExifCore;
 
-namespace LibExifCoreTester
+namespace LibExifCoreExample
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Running LibExifCore Test...");
+            if(args.Length == 0 || string.IsNullOrEmpty(args[0]))
+            {
+                Console.WriteLine("LibExifCore Example Tool");
+                Console.WriteLine("");
+                Console.WriteLine("Usage: LibExifCore.exe [path]");
+                Console.WriteLine("");
+                Console.WriteLine("path: file path to the image to analyze");
+                return;
+            }
 
             // The image path should be passed as the first parameter
             string imgPath = args[0];
+
+            if(!File.Exists(imgPath))
+            {
+                Console.WriteLine("File not found: " + imgPath);
+                return;
+            }
+
+            Console.WriteLine("Scanning file: " + imgPath);
 
             EXIFParser parser = new EXIFParser(imgPath);
 
