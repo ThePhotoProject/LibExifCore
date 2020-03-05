@@ -14,6 +14,10 @@ foreach(string key in parser.Tags.Keys)
 }
 ```
 
+### Supported File Types
+* HEIC
+* JPEG
+
 # Thanks
 
 This library was much easier to implement thanks to the work done by these projects:
