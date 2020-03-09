@@ -6,12 +6,21 @@ LibExifCore is a .NET Core library used for processing EXIF data.
 ```
 using LibExifCore;
 
-EXIFParser parser = new EXIFParser(imgPath);
+EXIFParser parser = new EXIFParser(imagePath);
 
-foreach(string key in parser.Tags.Keys)
+if (parser.ParseTags())
 {
-    string s = string.Format("{0}: {1}", key, parser.Tags[key]);
-    Console.WriteLine(s);
+    Console.WriteLine("Detected Tags:");
+    foreach (string key in parser.Tags.Keys)
+    {
+        string s = string.Format("{0}: {1}", key, parser.Tags[key]);
+
+        Console.WriteLine(s);
+    }
+}
+else
+{
+    Console.WriteLine("No valid tags detected.");
 }
 ```
 

@@ -21,25 +21,36 @@ namespace LibExifCoreExample
             // The image path should be passed as the first parameter
             string imgPath = args[0];
 
-            if(!File.Exists(imgPath))
+            PrintImageTags(imgPath);
+
+            Console.WriteLine("Test complete.");
+        }
+
+        private static void PrintImageTags(string imagePath)
+        {
+            if (!File.Exists(imagePath))
             {
-                Console.WriteLine("File not found: " + imgPath);
+                Console.WriteLine("File not found: " + imagePath);
                 return;
             }
 
-            Console.WriteLine("Scanning file: " + imgPath);
+            Console.WriteLine("Scanning file: " + imagePath);
 
-            EXIFParser parser = new EXIFParser(imgPath);
-
-            Console.WriteLine("Detected Tags:");
-            foreach(string key in parser.Tags.Keys)
+            EXIFParser parser = new EXIFParser(imagePath);
+            if (parser.ParseTags())
             {
-                string s = string.Format("{0}: {1}", key, parser.Tags[key]);
+                Console.WriteLine("Detected Tags:");
+                foreach (string key in parser.Tags.Keys)
+                {
+                    string s = string.Format("{0}: {1}", key, parser.Tags[key]);
 
-                Console.WriteLine(s);
+                    Console.WriteLine(s);
+                }
             }
-
-            Console.WriteLine("Test complete.");
+            else
+            {
+                Console.WriteLine("No valid tags detected.");
+            }
         }
     }
 }

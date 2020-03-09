@@ -11,6 +11,8 @@ namespace LibExifCore
     public class EXIFParser
     {
         public Dictionary<string, object> Tags { get; private set; }
+        private FileParser _parser;
+        private string _imagePath;
 
         public EXIFParser()
         {
@@ -19,26 +21,36 @@ namespace LibExifCore
 
         public EXIFParser(string imagePath) : base()
         {
-            FileParser parser = null;
+            _imagePath = imagePath;
 
             string extension = Path.GetExtension(imagePath).ToLower();
             if(extension.Equals(".heic"))
             {
-                parser = new HeicParser();
+                _parser = new HeicParser();
             }
             else if(extension.Equals(".jpg") || extension.Equals(".jpeg"))
             {
-                parser = new JpegParser();
+                _parser = new JpegParser();
             }
             else
             {
                 throw new NotImplementedException("Support for " + extension + " files is not yet implemented.");
             }
-
-            if (parser.ParseTags(imagePath))
-            {
-                Tags = parser.Tags;
-            }
         }
+
+        public bool ParseTags()
+        {
+            // Clear any previous tags
+            _parser.Tags.Clear();
+
+            bool success = _parser.ParseTags(_imagePath);
+            if(success)
+            {
+                Tags = _parser.Tags;
+            }
+
+            return success;
+        }
+
     }
 }
