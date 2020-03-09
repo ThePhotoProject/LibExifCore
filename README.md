@@ -23,5 +23,9 @@ foreach(string key in parser.Tags.Keys)
 
 This library was much easier to implement thanks to the work done by these projects:
 
-https://github.com/exiftool/exiftool
-https://github.com/exif-heic-js/exif-heic-js
+* https://github.com/exiftool/exiftool
+* https://github.com/exif-heic-js/exif-heic-js
+
+This repository provided a handy collection of images for testing:
+
+* https://github.com/ianare/exif-samples
