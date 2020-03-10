@@ -61,65 +61,73 @@ namespace LibExifCore.FileFormats
 
             Dictionary<string, object> tags = ReadTags(br, exifOffset, exifOffset + firstIFDOffset, EXIFStrings.TiffTags);
 
-            if (tags.ContainsKey("ExifIFDPointer"))
+            try
             {
-                UInt32 exifPointer = (UInt32)tags["ExifIFDPointer"];
-
-                Dictionary<string, object> exifDataTags = ReadTags(br, exifOffset, (UInt32)(exifOffset + exifPointer), EXIFStrings.ExifTags);
-
-                foreach (string tag in exifDataTags.Keys)
+                if (tags.ContainsKey("ExifIFDPointer"))
                 {
-                    object keyValue = exifDataTags[tag];
+                    UInt32 exifPointer = (UInt32)tags["ExifIFDPointer"];
 
-                    switch (tag)
+                    Dictionary<string, object> exifDataTags = ReadTags(br, exifOffset, (UInt32)(exifOffset + exifPointer), EXIFStrings.ExifTags);
+
+                    foreach (string tag in exifDataTags.Keys)
                     {
-                        case "LightSource":
-                        case "Flash":
-                        case "MeteringMode":
-                        case "ExposureProgram":
-                        case "SensingMethod":
-                        case "SceneCaptureType":
-                        case "SceneType":
-                        case "CustomRendered":
-                        case "WhiteBalance":
-                        case "GainControl":
-                        case "Contrast":
-                        case "Saturation":
-                        case "Sharpness":
-                        case "SubjectDistanceRange":
-                        case "FileSource":
-                            int exifTagVal = GetValueAsInt(exifDataTags[tag]);
-                            keyValue = EXIFStrings.Values[tag][exifTagVal];
-                            break;
+                        object keyValue = exifDataTags[tag];
 
-                        case "ExifVersion":
-                        case "FlashpixVersion":
-                            int exifTagVal2 = GetValueAsInt(exifDataTags[tag]);
-                            byte[] tagBytes = new byte[4];
-                            tagBytes[0] = (byte)(exifTagVal2 >> 24);
-                            tagBytes[1] = (byte)(exifTagVal2 >> 16);
-                            tagBytes[2] = (byte)(exifTagVal2 >> 8);
-                            tagBytes[3] = (byte)(exifTagVal2);
-                            keyValue = tagBytes[0].ToString() + tagBytes[1].ToString() + tagBytes[2].ToString() + tagBytes[3].ToString();
-                            break;
+                        switch (tag)
+                        {
+                            case "LightSource":
+                            case "Flash":
+                            case "MeteringMode":
+                            case "ExposureProgram":
+                            case "SensingMethod":
+                            case "SceneCaptureType":
+                            case "SceneType":
+                            case "CustomRendered":
+                            case "WhiteBalance":
+                            case "GainControl":
+                            case "Contrast":
+                            case "Saturation":
+                            case "Sharpness":
+                            case "SubjectDistanceRange":
+                            case "FileSource":
+                                int exifTagVal = GetValueAsInt(exifDataTags[tag]);
+                                keyValue = EXIFStrings.Values[tag][exifTagVal];
+                                break;
 
-                        case "ComponentsConfiguration":
-                            int exifTagVal3 = GetValueAsInt(exifDataTags[tag]);
-                            byte[] tagBytes2 = new byte[4];
-                            tagBytes2[0] = (byte)(exifTagVal3 >> 24);
-                            tagBytes2[1] = (byte)(exifTagVal3 >> 16);
-                            tagBytes2[2] = (byte)(exifTagVal3 >> 8);
-                            tagBytes2[3] = (byte)(exifTagVal3);
+                            case "ExifVersion":
+                            case "FlashpixVersion":
+                                int exifTagVal2 = GetValueAsInt(exifDataTags[tag]);
+                                byte[] tagBytes = new byte[4];
+                                tagBytes[0] = (byte)(exifTagVal2 >> 24);
+                                tagBytes[1] = (byte)(exifTagVal2 >> 16);
+                                tagBytes[2] = (byte)(exifTagVal2 >> 8);
+                                tagBytes[3] = (byte)(exifTagVal2);
+                                keyValue = tagBytes[0].ToString() + tagBytes[1].ToString() + tagBytes[2].ToString() + tagBytes[3].ToString();
+                                break;
 
-                            keyValue =
-                                EXIFStrings.ComponentStrings[tagBytes2[0]] +
-                                EXIFStrings.ComponentStrings[tagBytes2[1]] +
-                                EXIFStrings.ComponentStrings[tagBytes2[2]] +
-                                EXIFStrings.ComponentStrings[tagBytes2[3]];
-                            break;
+                            case "ComponentsConfiguration":
+                                int exifTagVal3 = GetValueAsInt(exifDataTags[tag]);
+                                byte[] tagBytes2 = new byte[4];
+                                tagBytes2[0] = (byte)(exifTagVal3 >> 24);
+                                tagBytes2[1] = (byte)(exifTagVal3 >> 16);
+                                tagBytes2[2] = (byte)(exifTagVal3 >> 8);
+                                tagBytes2[3] = (byte)(exifTagVal3);
+
+                                keyValue =
+                                    EXIFStrings.ComponentStrings[tagBytes2[0]] +
+                                    EXIFStrings.ComponentStrings[tagBytes2[1]] +
+                                    EXIFStrings.ComponentStrings[tagBytes2[2]] +
+                                    EXIFStrings.ComponentStrings[tagBytes2[3]];
+                                break;
+                        }
+                        tags[tag] = keyValue;
                     }
-                    tags[tag] = keyValue;
                 }
+            }
+            catch(InvalidCastException)
+            {
+                // Sometimes a file has corrupted or invalid markers, so ExifIFDPointer is random garbage instead of 
+                // a valid pointer. If that happens, we'll try to keep going for other tag types.
             }
 
             if (tags.ContainsKey("GPSInfoIFDPointer"))
