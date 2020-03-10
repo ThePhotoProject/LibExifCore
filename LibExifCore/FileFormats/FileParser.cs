@@ -91,6 +91,14 @@ namespace LibExifCore.FileFormats
                             case "SubjectDistanceRange":
                             case "FileSource":
                                 int exifTagVal = GetValueAsInt(exifDataTags[tag]);
+
+                                // A corrupted file might have an invalid index for a particular tag. If that's the case, skip
+                                // that tag but try to keep reading more tags.
+                                if(!EXIFStrings.Values.ContainsKey(tag) || !EXIFStrings.Values[tag].ContainsKey(exifTagVal))
+                                {
+                                    continue;
+                                }
+
                                 keyValue = EXIFStrings.Values[tag][exifTagVal];
                                 break;
 
