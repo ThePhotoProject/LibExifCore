@@ -138,29 +138,37 @@ namespace LibExifCore.FileFormats
                 // a valid pointer. If that happens, we'll try to keep going for other tag types.
             }
 
-            if (tags.ContainsKey("GPSInfoIFDPointer"))
+            try
             {
-                int gpsOffset = GetValueAsInt(tags["GPSInfoIFDPointer"]);
-                Dictionary<string, object> gpsDataTags = ReadTags(br, exifOffset, (uint)(exifOffset + gpsOffset), EXIFStrings.GPSTags);
-
-                foreach (string tag in gpsDataTags.Keys)
+                if (tags.ContainsKey("GPSInfoIFDPointer"))
                 {
-                    object keyValue = gpsDataTags[tag];
+                    int gpsOffset = GetValueAsInt(tags["GPSInfoIFDPointer"]);
+                    Dictionary<string, object> gpsDataTags = ReadTags(br, exifOffset, (uint)(exifOffset + gpsOffset), EXIFStrings.GPSTags);
 
-                    switch (tag)
+                    foreach (string tag in gpsDataTags.Keys)
                     {
-                        case "GPSVersionID":
-                            int tagVal = GetValueAsInt(gpsDataTags[tag]);
-                            byte[] tagBytes = new byte[4];
-                            tagBytes[0] = (byte)(tagVal >> 24);
-                            tagBytes[1] = (byte)(tagVal >> 16);
-                            tagBytes[2] = (byte)(tagVal >> 8);
-                            tagBytes[3] = (byte)(tagVal);
-                            keyValue = string.Format("{0}.{1}.{2}.{3}", tagBytes[0], tagBytes[1], tagBytes[2], tagBytes[3]);
-                            break;
+                        object keyValue = gpsDataTags[tag];
+
+                        switch (tag)
+                        {
+                            case "GPSVersionID":
+                                int tagVal = GetValueAsInt(gpsDataTags[tag]);
+                                byte[] tagBytes = new byte[4];
+                                tagBytes[0] = (byte)(tagVal >> 24);
+                                tagBytes[1] = (byte)(tagVal >> 16);
+                                tagBytes[2] = (byte)(tagVal >> 8);
+                                tagBytes[3] = (byte)(tagVal);
+                                keyValue = string.Format("{0}.{1}.{2}.{3}", tagBytes[0], tagBytes[1], tagBytes[2], tagBytes[3]);
+                                break;
+                        }
+                        tags[tag] = keyValue;
                     }
-                    tags[tag] = keyValue;
                 }
+            }
+            catch (InvalidCastException)
+            {
+                // A corrupted file might have a garbage GPSInfoIFDPointer. If this happens, skip trying to process
+                // the GPS info but keep the rest of the image tags.
             }
 
             return tags;
@@ -185,7 +193,11 @@ namespace LibExifCore.FileFormats
                 {
                     string tag = strings[tagIndex];
 
-                    tags[tag] = ReadTagValue(br, entryOffset, tiffStart, dirStart);
+                    object readValue = ReadTagValue(br, entryOffset, tiffStart, dirStart);
+                    if (readValue != null)
+                    {
+                        tags[tag] = readValue;
+                    }
                 }
                 else
                 {
@@ -254,6 +266,14 @@ namespace LibExifCore.FileFormats
                     {
                         uint numerator = parts[(i * 2)];
                         uint denominator = parts[(i * 2) + 1];
+
+                        // A file that wasn't encoded properly could cause a divide by zero here. If that happens, skip
+                        // this tag but keep reading more tags.
+                        if(denominator == 0)
+                        {
+                            return null;
+                        }
+
                         floats[i] = (numerator / denominator);
                     }
 
@@ -305,8 +325,7 @@ namespace LibExifCore.FileFormats
 
             if (obj is byte[])
             {
-                // If the system architecture is little-endian (that is, little end first),
-                // reverse the byte array.
+                // If the system architecture is little-endian, reverse the byte array.
                 //if (BitConverter.IsLittleEndian)
                 //    Array.Reverse(bytes);
 
