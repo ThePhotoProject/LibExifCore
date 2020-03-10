@@ -19,9 +19,10 @@ namespace LibExifCore
             Tags = new Dictionary<string, object>();
         }
 
-        public EXIFParser(string imagePath) : base()
+        public EXIFParser(string imagePath)
         {
-            _imagePath = imagePath;
+            Tags = new Dictionary<string, object>();
+            _imagePath = imagePath;           
 
             string extension = Path.GetExtension(imagePath).ToLower();
             if(extension.Equals(".heic"))
@@ -44,7 +45,7 @@ namespace LibExifCore
             _parser.Tags.Clear();
 
             bool success = _parser.ParseTags(_imagePath);
-            if(success)
+            if(success && _parser.Tags != null)
             {
                 Tags = _parser.Tags;
             }
