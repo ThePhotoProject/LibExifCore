@@ -33,8 +33,8 @@ namespace LibExifCore.FileFormats
             // Scan through metadata until we find (a) Exif, (b) iloc
             int exifOffset = -1;
             int ilocOffset = -1;
-            for (int i = (int)fTypeSize; i < metadataSize + fTypeSize; i++)  // copying the code exactly, but I think 
-            {                                                               // this should be var i = ftTypeSize + 4?
+            for (int i = (int)fTypeSize; i < metadataSize + fTypeSize; i++)  // FIXME: Should this should be var i = ftTypeSize + 4?
+            {                                                               
                 fileStream.Seek(i, SeekOrigin.Begin);
 
                 int nextValue = br.ReadInt32();
