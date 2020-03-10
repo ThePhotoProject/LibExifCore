@@ -129,6 +129,8 @@ namespace LibExifCore.FileFormats
 
                 foreach (string tag in gpsDataTags.Keys)
                 {
+                    object keyValue = gpsDataTags[tag];
+
                     switch (tag)
                     {
                         case "GPSVersionID":
@@ -138,10 +140,10 @@ namespace LibExifCore.FileFormats
                             tagBytes[1] = (byte)(tagVal >> 16);
                             tagBytes[2] = (byte)(tagVal >> 8);
                             tagBytes[3] = (byte)(tagVal);
-                            gpsDataTags[tag] = string.Format("{0}.{1}.{2}.{3}", tagBytes[0], tagBytes[1], tagBytes[2], tagBytes[3]);
+                            keyValue = string.Format("{0}.{1}.{2}.{3}", tagBytes[0], tagBytes[1], tagBytes[2], tagBytes[3]);
                             break;
                     }
-                    tags[tag] = gpsDataTags[tag];
+                    tags[tag] = keyValue;
                 }
             }
 
