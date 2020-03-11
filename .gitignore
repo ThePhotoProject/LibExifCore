@@ -3,3 +3,5 @@ LibExifCore/obj/
 LibExifCore/bin/
 LibExifCoreExample/bin/
 LibExifCoreExample/obj/
+XUnitLibExifCoreTests/bin/
+XUnitLibExifCoreTests/obj/

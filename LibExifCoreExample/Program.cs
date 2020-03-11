@@ -25,30 +25,7 @@ namespace LibExifCoreExample
 
             PrintImageTags(imgPath);
 
-            Console.WriteLine("Test complete.");
-        }
-
-        private static void TestAllImagesAtPath(string path)
-        {
-            Console.WriteLine("Testing images at path: " + path);
-            
-            string[] extensions = new string[] { ".jpg", ".jpeg", ".heic" };
-
-            List<string> imageFiles = Directory.GetFiles(path)
-                                    .Where(file => extensions.Any(file.ToLower().EndsWith))
-                                    .ToList();
-
-            foreach (string img in imageFiles)
-            {
-                PrintImageTags(img);
-            }
-
-            // Recursively search folders for more images
-            string[] directories = Directory.GetDirectories(path);
-            foreach(string dir in directories)
-            {
-                TestAllImagesAtPath(dir);
-            }
+            Console.WriteLine("Finished printing tags.");
         }
 
         private static void PrintImageTags(string imagePath)
