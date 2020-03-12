@@ -35,7 +35,9 @@ namespace LibExifCore.FileFormats
                 // but right now this is only handling 0xFFE1 for EXIF data
                 if (marker == 0xE1)
                 {
-                    Tags = ReadExifData(br, (uint)(offset + 4 + 6));
+                    uint exifOffset = (uint)(offset + 4 + 6);
+
+                    Tags = ReadExifData(br, exifOffset);
                     return true;
                 }
                 else
