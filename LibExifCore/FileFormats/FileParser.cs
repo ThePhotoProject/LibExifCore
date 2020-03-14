@@ -20,16 +20,10 @@ namespace LibExifCore.FileFormats
         /// <returns>True if tags were detected and processed, otherwise false</returns>
         public abstract bool ParseTags(string filePath);
 
-        protected Dictionary<string, object> ReadExifData(BinaryReader reader, uint exifOffset)
+        protected Dictionary<string, object> ReadExifData(BinaryReader reader)
         {
-            // Should we make assumptions about endianness for HEIC? Really the only code
-            // difference would be instantiating a BinaryReader vs BigEndianBinaryReader
-
-            reader.BaseStream.Seek(exifOffset, SeekOrigin.Begin);   // fixme: get rid of this line and exifOffset parameter
-
-            bool bigEndian;
-
             // Test for TIFF validity and endian
+            bool bigEndian;
             ushort tiffCheck = reader.ReadUInt16();
             if (tiffCheck == 0x4949)
             {
@@ -71,6 +65,7 @@ namespace LibExifCore.FileFormats
                 return null;
             }
 
+            uint exifOffset = (uint)(br.BaseStream.Position) - 8;
             Dictionary<string, object> tags = ReadTags(br, exifOffset, exifOffset + firstIFDOffset, EXIFStrings.TiffTags);
 
             try
@@ -205,7 +200,7 @@ namespace LibExifCore.FileFormats
                 {
                     string tag = strings[tagIndex];
 
-                    object readValue = ReadTagValue(br, entryOffset, tiffStart, dirStart);
+                    object readValue = ReadTagValue(br, entryOffset, tiffStart);
                     if (readValue != null)
                     {
                         tags[tag] = readValue;
@@ -220,7 +215,7 @@ namespace LibExifCore.FileFormats
             return tags;
         }
 
-        protected object ReadTagValue(BinaryReader br, uint entryOffset, uint tiffStart, uint dirStart)
+        protected object ReadTagValue(BinaryReader br, uint entryOffset, uint tiffStart)
         {
             br.BaseStream.Seek(entryOffset + 2, SeekOrigin.Begin);
 

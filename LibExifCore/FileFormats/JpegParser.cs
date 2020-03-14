@@ -35,9 +35,10 @@ namespace LibExifCore.FileFormats
                 // but right now this is only handling 0xFFE1 for EXIF data
                 if (marker == 0xE1)
                 {
-                    uint exifOffset = (uint) br.BaseStream.Position + 8; // temporary
+                    // Move 8 bytes forward to the start of EXIF data
+                    br.BaseStream.Seek(8, SeekOrigin.Current);
 
-                    Tags = ReadExifData(bigReader, exifOffset);
+                    Tags = ReadExifData(bigReader);
                     return true;
                 }
                 else

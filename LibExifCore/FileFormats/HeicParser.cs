@@ -73,10 +73,14 @@ namespace LibExifCore.FileFormats
 
                     // Check prefix at exifOffset
                     fileStream.Seek(exifLocation, SeekOrigin.Begin);
+
                     uint prefixSize = 4 + br.ReadUInt32();
                     uint exifOffset2 = exifLocation + prefixSize;
 
-                    Tags = ReadExifData(br, exifOffset2);
+                    // Move forward to the start of EXIF data
+                    br.BaseStream.Seek(exifOffset2, SeekOrigin.Begin);
+
+                    Tags = ReadExifData(br);
                     return true;
                 }
             }
