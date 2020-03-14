@@ -20,24 +20,24 @@ namespace LibExifCore.FileFormats
         /// <returns>True if tags were detected and processed, otherwise false</returns>
         public abstract bool ParseTags(string filePath);
 
-        protected Dictionary<string, object> ReadExifData(BinaryReader br, uint exifOffset)
+        protected Dictionary<string, object> ReadExifData(BinaryReader reader, uint exifOffset)
         {
             // Should we make assumptions about endianness for HEIC? Really the only code
             // difference would be instantiating a BinaryReader vs BigEndianBinaryReader
 
-            br.BaseStream.Seek(exifOffset, SeekOrigin.Begin);
+            reader.BaseStream.Seek(exifOffset, SeekOrigin.Begin);   // fixme: get rid of this line and exifOffset parameter
 
-            //bool bigEndian;
+            bool bigEndian;
 
             // Test for TIFF validity and endian
-            ushort tiffCheck = br.ReadUInt16();
+            ushort tiffCheck = reader.ReadUInt16();
             if (tiffCheck == 0x4949)
             {
-                //bigEndian = false;
+                bigEndian = false;
             }
             else if (tiffCheck == 0x4D4D)
             {
-                //bigEndian = true;
+                bigEndian = true;
             }
             else
             {
@@ -45,8 +45,20 @@ namespace LibExifCore.FileFormats
                 return null;
             }
 
-            br.BaseStream.Seek(exifOffset + 2, SeekOrigin.Begin);
-            if (br.ReadUInt16() != 0x002A)
+            // Use a different reader depending on which endian data we have
+            BinaryReader br;
+            if(bigEndian)
+            {
+                br = new BigEndianBinaryReader(reader.BaseStream);
+            }
+            else
+            {
+                // BinaryReader is little-endian
+                br = new BinaryReader(reader.BaseStream);
+            }
+
+            UInt16 tiffMarker = br.ReadUInt16();
+            if (tiffMarker != 0x002A)
             {
                 // Not valid TIFF data! (no 0x002A)
                 return null;
