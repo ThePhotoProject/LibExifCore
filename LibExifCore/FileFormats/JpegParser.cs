@@ -19,10 +19,10 @@ namespace LibExifCore.FileFormats
             int offset = 2;
             long length = fileStream.Length;
 
+            BigEndianBinaryReader bigReader = new BigEndianBinaryReader(fileStream);
+
             while (offset < length)
             {
-                br.BaseStream.Seek(offset, SeekOrigin.Begin);
-
                 if(br.ReadByte() != 0xFF)
                 {
                     // Not a valid marker at this offset, something is wrong!
@@ -35,14 +35,19 @@ namespace LibExifCore.FileFormats
                 // but right now this is only handling 0xFFE1 for EXIF data
                 if (marker == 0xE1)
                 {
-                    uint exifOffset = (uint)(offset + 4 + 6);
+                    uint exifOffset = (uint) br.BaseStream.Position + 8; // temporary
 
-                    Tags = ReadExifData(br, exifOffset);
+                    Tags = ReadExifData(bigReader, exifOffset);
                     return true;
                 }
                 else
                 {
-                    offset += 2 + br.ReadUInt16();
+                    UInt16 nextOffset = bigReader.ReadUInt16();
+
+                    offset += nextOffset;
+
+                    // -2 because we already read the size and that's the first 2 bytes of that section
+                    br.BaseStream.Seek(nextOffset - 2, SeekOrigin.Current);
                 }
             }
 
