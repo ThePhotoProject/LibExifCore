@@ -46,8 +46,8 @@ namespace LibExifCore.FileFormats
 
                     offset += nextOffset;
 
-                    // -2 because we already read the size and that's the first 2 bytes of that section
-                    br.BaseStream.Seek(nextOffset - 2, SeekOrigin.Current);
+                    // -Uint16 because we already read the size and that's the first 2 bytes of that section
+                    br.BaseStream.Seek(nextOffset - sizeof(UInt16), SeekOrigin.Current);
                 }
             }
 
