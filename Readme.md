@@ -31,10 +31,9 @@ else
 
 # Thanks
 
-This library was much easier to implement thanks to the work done by these projects:
+This library was much easier to implement thanks to the work done by:
 
 * https://github.com/exiftool/exiftool
-* https://github.com/exif-heic-js/exif-heic-js
 
 This repository provided a handy collection of images for testing:
 
