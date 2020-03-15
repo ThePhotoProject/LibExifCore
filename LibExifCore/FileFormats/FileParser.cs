@@ -121,18 +121,13 @@ namespace LibExifCore.FileFormats
                                 break;
 
                             case "ComponentsConfiguration":
-                                int exifTagVal3 = GetValueAsInt(exifDataTags[tag]);
-                                byte[] tagBytes2 = new byte[4];
-                                tagBytes2[0] = (byte)(exifTagVal3 >> 24);
-                                tagBytes2[1] = (byte)(exifTagVal3 >> 16);
-                                tagBytes2[2] = (byte)(exifTagVal3 >> 8);
-                                tagBytes2[3] = (byte)(exifTagVal3);
+                                byte[] byteArray = (byte[])exifDataTags[tag];
+                                keyValue = string.Empty;
 
-                                keyValue =
-                                    EXIFStrings.ComponentStrings[tagBytes2[0]] +
-                                    EXIFStrings.ComponentStrings[tagBytes2[1]] +
-                                    EXIFStrings.ComponentStrings[tagBytes2[2]] +
-                                    EXIFStrings.ComponentStrings[tagBytes2[3]];
+                                for(int i = 0; i < byteArray.Length; i++)
+                                {
+                                    keyValue += EXIFStrings.ComponentStrings[byteArray[i]];
+                                }
                                 break;
                         }
                         tags[tag] = keyValue;
@@ -344,7 +339,8 @@ namespace LibExifCore.FileFormats
                 //if (BitConverter.IsLittleEndian)
                 //    Array.Reverse(bytes);
 
-                return BitConverter.ToInt32((byte[])obj, 0);
+                byte[] byteArray = (byte[])obj;
+                return BitConverter.ToInt32(byteArray, 0);
             }
 
             return Convert.ToInt32(obj);
