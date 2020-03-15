@@ -27,6 +27,7 @@ else
 ### Supported File Types
 * HEIC
 * JPEG
+* TIFF
 
 # Thanks
 
