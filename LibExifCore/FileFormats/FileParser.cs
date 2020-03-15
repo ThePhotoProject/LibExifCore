@@ -240,10 +240,18 @@ namespace LibExifCore.FileFormats
                     break;
 
                 case 2: // ascii, 8-bit byte
-                    offset = numValues > 4 ? valueOffset : (entryOffset + 8);
-                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
-                    byte[] vals = br.ReadBytes((int)numValues - 1);
-                    result = System.Text.ASCIIEncoding.ASCII.GetString(vals, 0, vals.Length);
+                    if (numValues > 0)
+                    {
+                        offset = numValues > 4 ? valueOffset : (entryOffset + 8);
+                        br.BaseStream.Seek(offset, SeekOrigin.Begin);
+                        byte[] vals = br.ReadBytes((int)numValues - 1);
+                        result = System.Text.ASCIIEncoding.ASCII.GetString(vals, 0, vals.Length);
+                    }
+                    else
+                    {
+                        // An image with an empty description field could have a length of 0
+                        result = string.Empty;
+                    }
                     break;
 
                 case 3: // short, 16 bit int
